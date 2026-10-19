@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interaktiv Rasmli Slayder | 5 Ta Maxsus Slayd</title>
+  <meta name="description" content="O'ng va chap strelkalari, ovoz effektlari va chiroyli animatsiyalarga ega bo'lgan 5 ta rasmli interaktiv slayd.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Ambient Glow -->
+  <div class="ambient-glow" id="ambient-glow"></div>
+
+  <!-- Top Bar Controls -->
+  <header class="slider-topbar">
+    <div class="logo-box">
+      <i data-lucide="sparkles"></i>
+      <span>PREMIUM SLIDER</span>
+    </div>
+
+    <div class="top-controls">
+      <!-- Autoplay Button -->
+      <button class="icon-btn" id="btn-autoplay" title="Avtomatik o'tishni yoqish / to'xtatish">
+        <i data-lucide="play" id="autoplay-icon"></i>
+        <span class="btn-caption" id="autoplay-text">Avto: O'chiq</span>
+      </button>
+
+      <!-- Real Meme Sound Status Button -->
+      <button class="icon-btn meme-btn" id="btn-meme-mode" title="Ovoz rejimi: Chingiz (O'ngga) va Faaah (Chapga)">
+        <i data-lucide="laugh" id="meme-icon"></i>
+        <span class="btn-caption" id="meme-mode-text">Meme: Chingiz & Faaah</span>
+      </button>
+
+      <!-- Sound Toggle -->
+      <button class="icon-btn" id="btn-sound" title="Ovozni yoqish / o'chirish">
+        <i data-lucide="volume-2" id="sound-icon"></i>
+        <span class="btn-caption" id="sound-text">Ovoz: Yoqiq</span>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button class="icon-btn" id="btn-fullscreen" title="To'liq ekran (F)">
+        <i data-lucide="maximize" id="fullscreen-icon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Slider Container -->
+  <main class="slider-wrapper">
+
+    <!-- Left Arrow Button -->
+    <button class="nav-arrow nav-arrow-left" id="btn-prev" aria-label="Oldingi rasm (Chap strelka)" title="Oldingi rasmga qaytish (←)">
+      <div class="arrow-circle">
+        <i data-lucide="chevron-left"></i>
+      </div>
+      <span class="arrow-hint">Chapga</span>
+    </button>
+
+    <!-- Slide Carousel Viewport -->
+    <div class="slides-viewport" id="slides-viewport">
+
+      <!-- SLIDE 1 -->
+      <div class="slide-item active" data-index="1" data-accent="#00f2fe">
+        <div class="slide-image-wrap">
+          <img 
+            src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1920&q=85" 
+            alt="Kelajak Megapolisi" 
+            class="slide-img"
+          >
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag tag-cyan">
+            <i data-lucide="map-pin"></i> 01 / TEXNOLOGIYA SHAHRI
+          </span>
+          <h2 class="slide-title">Kelajak Megapolisi & Kiber Olam</h2>
+          <p class="slide-desc">
+            Baland osmono'par binolar, neon nurlar, intellektual transport tizimi va tungi yulduzlar ostidagi kelajak sivilizatsiyasi.
+          </p>
+          <div class="slide-badges">
+            <span>#Cyberpunk</span>
+            <span>#SmartCity</span>
+            <span>#NeonFuture</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide-item" data-index="2" data-accent="#a855f7">
+        <div class="slide-image-wrap">
+          <img 
+            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=85" 
+            alt="Sun'iy Intellekt va Neyron To'lqinlar" 
+            class="slide-img"
+          >
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag tag-purple">
+            <i data-lucide="brain"></i> 02 / SUN'IY INTELLEKT
+          </span>
+          <h2 class="slide-title">Neyron To'lqinlar va Kvant Tafakkur</h2>
+          <p class="slide-desc">
+            Inson aqli va mashina intellektining uyg'unlashuvi. Cheksiz ma'lumotlar oqimi yangi imkoniyatlar eshigini ochadi.
+          </p>
+          <div class="slide-badges">
+            <span>#AI_Logic</span>
+            <span>#Quantum</span>
+            <span>#DeepLearning</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide-item" data-index="3" data-accent="#38bdf8">
+        <div class="slide-image-wrap">
+          <img 
+            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=85" 
+            alt="Cheksiz Koinot va Sayyoralar" 
+            class="slide-img"
+          >
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag tag-blue">
+            <i data-lucide="globe"></i> 03 / CHEKSIZ KOINOT
+          </span>
+          <h2 class="slide-title">Ona Yer va Koinot Mo'jizalari</h2>
+          <p class="slide-desc">
+            Koinot bag'ridagi ko'k marvarid — sayyoramizning tunda yaraqlagan qit'alari va milliardlab yulduzlar jilosi.
+          </p>
+          <div class="slide-badges">
+            <span>#Cosmos</span>
+            <span>#SpaceExploration</span>
+            <span>#PlanetEarth</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide-item" data-index="4" data-accent="#10b981">
+        <div class="slide-image-wrap">
+          <img 
+            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1920&q=85" 
+            alt="Kiber Xavfsizlik va Kodlar Oqimi" 
+            class="slide-img"
+          >
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag tag-green">
+            <i data-lucide="terminal"></i> 04 / DASTURLASH
+          </span>
+          <h2 class="slide-title">Matritsa va Kiber-Xavfsizlik</h2>
+          <p class="slide-desc">
+            Har soniyada millionlab operatsiyalarni boshqaruvchi kod satrlari. Dunyoni himoya qiluvchi kuchli algoritmlar.
+          </p>
+          <div class="slide-badges">
+            <span>#CodingMatrix</span>
+            <span>#CyberSecurity</span>
+            <span>#FullStack</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 -->
+      <div class="slide-item" data-index="5" data-accent="#f59e0b">
+        <div class="slide-image-wrap">
+          <img 
+            src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=85" 
+            alt="Sehrli Tabiat va Okean" 
+            class="slide-img"
+          >
+          <div class="slide-overlay"></div>
+        </div>
+        <div class="slide-content">
+          <span class="slide-tag tag-amber">
+            <i data-lucide="sun"></i> 05 / TABIAT GO'ZALLIGI
+          </span>
+          <h2 class="slide-title">Sehrli Sohil va Oltin Quyosh</h2>
+          <p class="slide-desc">
+            Moviy to'lqinlar shovqini, sokin plyaj va oltin quyosh botishi. Tabiatning eng ilhomlantiruvchi osoyishtaligi.
+          </p>
+          <div class="slide-badges">
+            <span>#OceanBreeze</span>
+            <span>#SunsetVibes</span>
+            <span>#Serenity</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Arrow Button -->
+    <button class="nav-arrow nav-arrow-right" id="btn-next" aria-label="Keyingi rasm (O'ng strelka)" title="Keyingi rasmga o'tish (→)">
+      <span class="arrow-hint">O'ngga</span>
+      <div class="arrow-circle">
+        <i data-lucide="chevron-right"></i>
+      </div>
+    </button>
+
+    <!-- Slide Index Counter Display -->
+    <div class="slide-counter">
+      <span class="counter-curr" id="counter-curr">01</span>
+      <span class="counter-divider">/</span>
+      <span class="counter-total" id="counter-total">05</span>
+    </div>
+
+    <!-- Autoplay Timer Line Indicator -->
+    <div class="autoplay-progress-container">
+      <div class="autoplay-progress-bar" id="autoplay-progress"></div>
+    </div>
+
+    <!-- Real MP3 Audio Elements -->
+    <audio id="audio-chingiz" src="chingiz-qaytar-qaytar.mp3" preload="auto"></audio>
+    <audio id="audio-faaah" src="faaah.mp3" preload="auto"></audio>
+
+    <!-- Floating Meme Character & Speech Bubble -->
+    <div class="meme-character-widget" id="meme-widget">
+      <div class="meme-speech-bubble" id="meme-bubble">
+        <span class="speech-quote" id="speech-quote">O'ngga bossangiz Chingiz, chapga bossangiz Faaah! 😂</span>
+      </div>
+      <div class="meme-buttons-row">
+        <button class="meme-avatar-badge" id="btn-play-chingiz" title="Chingiz ovozini eshitish">
+          <div class="meme-face-icon">😱</div>
+          <span class="meme-actor-name">Chingiz (Qaytar)</span>
+        </button>
+        <button class="meme-avatar-badge" id="btn-play-faaah" title="Faaah ovozini eshitish">
+          <div class="meme-face-icon">🎤</div>
+          <span class="meme-actor-name">Faaah!</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Thumbnails & Dots Bar -->
+  <footer class="slider-footer">
+    <!-- Dot Indicators -->
+    <div class="dots-container" id="dots-container">
+      <!-- Dots populated by JS -->
+    </div>
+
+    <!-- Mini Thumbnails Bar -->
+    <div class="thumbs-container" id="thumbs-container">
+      <!-- Thumbnails populated by JS -->
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

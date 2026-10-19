@@ -1,0 +1,788 @@
+/* ==========================================================================
+   PREMIUM 5-IMAGE INTERACTIVE SLIDER
+   Left/Right Direction-Aware Transitions, Dynamic Ambient Glow & Glassmorphism
+   ========================================================================== */
+
+:root {
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+
+  --bg-deep: #07090e;
+  --text-light: #ffffff;
+  --text-muted: #cbd5e1;
+  --text-dim: #94a3b8;
+
+  --accent-active: #00f2fe;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slide: 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+  font-family: var(--font-main);
+  color: var(--text-light);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dynamic Ambient Glow Behind Slides */
+.ambient-glow {
+  position: fixed;
+  inset: -10%;
+  width: 120vw;
+  height: 120vh;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.18) 0%, transparent 60%);
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+  transition: background 1s ease;
+}
+
+/* ==========================================================================
+   TOP BAR
+   ========================================================================== */
+.slider-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(180deg, rgba(7, 9, 14, 0.85) 0%, transparent 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.logo-box i {
+  color: var(--accent-active);
+  width: 18px;
+  height: 18px;
+}
+
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(8px);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.icon-btn i {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-active);
+}
+
+/* ==========================================================================
+   MAIN SLIDER WRAPPER & VIEWPORT
+   ========================================================================== */
+.slider-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.slides-viewport {
+  position: relative;
+  width: calc(100vw - 160px);
+  height: calc(100vh - 180px);
+  max-width: 1400px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Slide Item */
+.slide-item {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.92);
+  transition: opacity var(--transition-slide),
+              transform var(--transition-slide),
+              filter var(--transition-slide),
+              visibility var(--transition-slide);
+  will-change: transform, opacity, filter;
+}
+
+.slide-item.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1) translateX(0) rotateY(0deg);
+  z-index: 2;
+  filter: blur(0px);
+}
+
+/* Direction-Aware Transition Classes */
+/* Forward (Next -> Right to Left) */
+.slide-item.slide-out-left {
+  opacity: 0 !important;
+  transform: translateX(-80%) scale(0.88) rotateY(-8deg) !important;
+  filter: blur(10px) !important;
+  z-index: 1;
+}
+
+.slide-item.slide-in-right {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(0) scale(1) rotateY(0deg) !important;
+  filter: blur(0px) !important;
+  z-index: 2;
+}
+
+/* Backward (Prev -> Left to Right) */
+.slide-item.slide-out-right {
+  opacity: 0 !important;
+  transform: translateX(80%) scale(0.88) rotateY(8deg) !important;
+  filter: blur(10px) !important;
+  z-index: 1;
+}
+
+.slide-item.slide-in-left {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(0) scale(1) rotateY(0deg) !important;
+  filter: blur(0px) !important;
+  z-index: 2;
+}
+
+/* Slide Image & Overlay */
+.slide-image-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.02);
+  transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide-item.active .slide-img {
+  transform: scale(1.08);
+}
+
+/* Cinematic Dark Gradients Over Image */
+.slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(7, 9, 14, 0.25) 0%,
+    rgba(7, 9, 14, 0.45) 45%,
+    rgba(7, 9, 14, 0.92) 100%
+  ),
+  linear-gradient(
+    90deg,
+    rgba(7, 9, 14, 0.8) 0%,
+    rgba(7, 9, 14, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+/* Slide Text Content */
+.slide-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  max-width: 760px;
+  padding: 48px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.slide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+  backdrop-filter: blur(10px);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+.tag-cyan { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.4); }
+.tag-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+.tag-blue { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
+.tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+.tag-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+.slide-tag i {
+  width: 14px;
+  height: 14px;
+}
+
+.slide-title {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  transform: translateY(25px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+}
+
+.slide-desc {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  max-width: 650px;
+  transform: translateY(25px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+}
+
+.slide-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  transform: translateY(25px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.45s;
+}
+
+.slide-badges span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  color: #e2e8f0;
+  backdrop-filter: blur(8px);
+}
+
+/* Stagger in text on active slide */
+.slide-item.active .slide-tag,
+.slide-item.active .slide-title,
+.slide-item.active .slide-desc,
+.slide-item.active .slide-badges {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   INTERACTIVE NAVIGATION ARROWS (LEFT & RIGHT)
+   ========================================================================== */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+  outline: none;
+}
+
+.nav-arrow:hover {
+  transform: translateY(-50%) scale(1.08);
+}
+
+.nav-arrow:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.nav-arrow-left {
+  left: 20px;
+}
+
+.nav-arrow-right {
+  right: 20px;
+}
+
+.arrow-circle {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: rgba(18, 24, 38, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: all var(--transition-fast);
+}
+
+.nav-arrow:hover .arrow-circle {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-active);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6),
+              0 0 20px rgba(0, 242, 254, 0.4);
+}
+
+.arrow-circle i {
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  transition: transform var(--transition-fast);
+}
+
+.nav-arrow-left:hover .arrow-circle i {
+  transform: translateX(-4px);
+  color: var(--accent-active);
+}
+
+.nav-arrow-right:hover .arrow-circle i {
+  transform: translateX(4px);
+  color: var(--accent-active);
+}
+
+.arrow-hint {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  transition: color var(--transition-fast);
+}
+
+.nav-arrow:hover .arrow-hint {
+  color: #fff;
+}
+
+/* ==========================================================================
+   SLIDE COUNTER BADGE & AUTOPLAY PROGRESS
+   ========================================================================== */
+.slide-counter {
+  position: absolute;
+  top: 36px;
+  right: 100px;
+  z-index: 25;
+  background: rgba(7, 9, 14, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.counter-curr {
+  font-weight: 800;
+  color: var(--accent-active);
+}
+
+.counter-divider {
+  color: var(--text-dim);
+}
+
+.counter-total {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Autoplay Progress Line (Bottom of viewport) */
+.autoplay-progress-container {
+  position: absolute;
+  bottom: calc(50% - (calc(100vh - 180px) / 2));
+  left: 80px;
+  right: 80px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 25;
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.autoplay-active .autoplay-progress-container {
+  opacity: 1;
+}
+
+.autoplay-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-active);
+  box-shadow: 0 0 10px var(--accent-active);
+  transition: width 0.1s linear;
+}
+
+/* ==========================================================================
+   FOOTER: MINI THUMBNAILS & DOTS
+   ========================================================================== */
+.slider-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: linear-gradient(0deg, rgba(7, 9, 14, 0.95) 0%, transparent 100%);
+}
+
+/* Dots */
+.dots-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dot-btn:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.2);
+}
+
+.dot-btn.active {
+  width: 38px;
+  background: var(--accent-active);
+  box-shadow: 0 0 12px var(--accent-active);
+}
+
+/* Thumbnails */
+.thumbs-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.thumb-item {
+  width: 60px;
+  height: 42px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  opacity: 0.55;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb-item:hover {
+  opacity: 0.9;
+  transform: translateY(-4px) scale(1.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.thumb-item.active {
+  opacity: 1;
+  border-color: var(--accent-active);
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 4px 14px rgba(0, 242, 254, 0.4);
+}
+
+/* Meme Mode Button */
+.meme-btn {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(245, 158, 11, 0.25)) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fef08a !important;
+  font-weight: 700 !important;
+  animation: memeGlow 3s infinite alternate;
+}
+
+.meme-btn i {
+  color: #f59e0b !important;
+}
+
+@keyframes memeGlow {
+  0% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+  100% { box-shadow: 0 0 18px rgba(239, 68, 68, 0.5); }
+}
+
+/* ==========================================================================
+   FLOATING MEME CHARACTER & SPEECH BUBBLE
+   ========================================================================== */
+.meme-character-widget {
+  position: absolute;
+  bottom: 30px;
+  right: 40px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.meme-speech-bubble {
+  position: relative;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(14px);
+  border: 2px solid #f59e0b;
+  border-radius: 18px 18px 4px 18px;
+  padding: 12px 18px;
+  max-width: 340px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.3);
+  margin-bottom: 12px;
+  opacity: 1;
+  transform-origin: bottom right;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.meme-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: 22px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #f59e0b;
+}
+
+.speech-quote {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #fef08a;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+
+/* Speech bubble states */
+.bubble-panic {
+  border-color: #ef4444 !important;
+  background: rgba(40, 10, 15, 0.95) !important;
+  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.5) !important;
+  animation: bubbleShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.bubble-panic .speech-quote {
+  color: #fca5a5 !important;
+}
+
+.bubble-panic::after {
+  border-top-color: #ef4444 !important;
+}
+
+.bubble-peace {
+  border-color: #10b981 !important;
+  background: rgba(6, 40, 25, 0.95) !important;
+  box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4) !important;
+  animation: bubblePulse 0.5s ease-out;
+}
+
+.bubble-peace .speech-quote {
+  color: #6ee7b7 !important;
+}
+
+.bubble-peace::after {
+  border-top-color: #10b981 !important;
+}
+
+@keyframes bubbleShake {
+  10%, 90% { transform: translate3d(-3px, 0, 0) scale(1.05); }
+  20%, 80% { transform: translate3d(4px, 0, 0) scale(1.05); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0) scale(1.08); }
+  40%, 60% { transform: translate3d(5px, 0, 0) scale(1.08); }
+}
+
+@keyframes bubblePulse {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.meme-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.meme-avatar-badge {
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(14px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px 6px 8px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: all var(--transition-fast);
+}
+
+.meme-avatar-badge:hover {
+  transform: scale(1.1) rotate(-3deg);
+  border-color: #f59e0b;
+}
+
+.meme-face-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  transition: transform 0.2s;
+}
+
+.meme-avatar-badge:hover .meme-face-icon {
+  transform: rotate(15deg);
+}
+
+.meme-actor-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+/* Screen Shake effect on panic "VAYY BLEEEE" */
+.screen-shake {
+  animation: viewportShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes viewportShake {
+  10%, 90% { transform: translate3d(-4px, -2px, 0); }
+  20%, 80% { transform: translate3d(5px, 3px, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 4px, 0); }
+  40%, 60% { transform: translate3d(6px, -4px, 0); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .slides-viewport {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 160px);
+  }
+  .slide-title {
+    font-size: 1.8rem;
+  }
+  .slide-content {
+    padding: 24px;
+  }
+  .nav-arrow-left { left: 8px; }
+  .nav-arrow-right { right: 8px; }
+  .arrow-circle { width: 48px; height: 48px; }
+  .arrow-circle i { width: 24px; height: 24px; }
+  .thumbs-container { display: none; }
+  .slide-counter { right: 30px; }
+  .meme-character-widget {
+    bottom: 90px;
+    right: 16px;
+  }
+  .meme-speech-bubble {
+    max-width: 250px;
+    font-size: 0.85rem;
+  }
+}
+
